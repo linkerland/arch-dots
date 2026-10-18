@@ -1,6 +1,6 @@
 # arch-dots
 
-Personal Arch Linux dotfiles for an i3/X11 desktop, with a charcoal and sage theme. The setup includes a mouse-friendly Neovim environment for Rust, Python, Bash, C, and Markdown, plus Fastfetch, Starship, Polybar, Picom, GTK, and Thunar settings.
+I daily drive these dots on my surface pro 7 i use for school :D
 
 ## Install
 
@@ -17,7 +17,7 @@ Log out and back in to start or refresh the desktop session. Reload i3 with **Mo
 ## Notes
 
 - `Mod+Shift+S` saves a fullscreen screenshot in `~/Pictures` with `maim`.
-- The terminal wrapper prefers `st` at `/usr/sbin/st` or `/usr/bin/st`, and falls back to `xterm`. Install your preferred `st` build separately if you want it as the main terminal.
 - The Polybar battery module uses `BAT1` and `ADP1`, matching the machine these settings came from. Change those names in `.config/polybar/config.ini` if your hardware reports different power-supply names.
-- Wallpaper files and wallpaper-manager state are not included. Add your own wallpaper locally.
-- Browser profiles, credentials, caches, logs, package build artifacts, and unrelated application data are intentionally excluded.
+
+## Credits
+DistroTube - ST and dmenu builds
