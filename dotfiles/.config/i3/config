@@ -51,7 +51,7 @@ bindsym $mod+Shift+q kill
 # start dmenu (a program launcher)
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id dmenu_run -p "Run: " \
+bindsym $mod+d exec --no-startup-id dmenu_run -c -bw 2 -l 20 -g 4 -p "Run: " \
   -nb "#202720" \
   -nf "#c5d1c0" \
   -sb "#3f5f3a" \

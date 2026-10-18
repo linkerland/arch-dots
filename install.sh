@@ -5,8 +5,8 @@ usage() {
     cat <<'USAGE'
 Usage: ./install.sh [--skip-packages]
 
-Install the Arch Linux packages used by these dotfiles, back up managed files,
-and copy the configuration into your home directory. Run as your normal user.
+Install the Arch Linux packages and the local st/dmenu packages, back up managed
+files, and copy the configuration into your home directory. Run as your normal user.
 USAGE
 }
 
@@ -38,13 +38,50 @@ if (( install_packages )); then
         exit 1
     fi
     packages=(
-        adwaita-icon-theme bash-language-server base-devel brightnessctl clang dmenu dex
-        fastfetch feh fontconfig gtk3 i3-wm i3lock maim neovim network-manager-applet
+        adwaita-icon-theme bash-language-server base-devel brightnessctl clang dex
+        fastfetch feh fontconfig git gtk3 harfbuzz i3-wm i3lock libx11 libxft libxinerama
+        libxrender maim neovim network-manager-applet
         noto-fonts noto-fonts-emoji npm orchis-theme picom polybar python
-        python-lsp-server rust rust-analyzer shfmt shellcheck starship thunar
-        ttf-dejavu-nerd tree-sitter-cli xclip xorg-xrdb xss-lock xterm libpulse
+        pkgconf python-lsp-server rust rust-analyzer shfmt shellcheck starship thunar
+        ttf-dejavu-nerd ttf-hack tree-sitter-cli xclip xorg-xrdb xss-lock xterm libpulse
     )
     sudo pacman -S --needed "${packages[@]}"
+
+    if ! pacman -Qq ttf-joypixels >/dev/null 2>&1; then
+        if command -v yay >/dev/null 2>&1; then
+            yay -S --needed ttf-joypixels
+        else
+            printf 'ttf-joypixels is an AUR dependency. Install it with an AUR helper, then rerun this script.\n' >&2
+            exit 1
+        fi
+    fi
+
+    if ! command -v makepkg >/dev/null 2>&1; then
+        printf 'makepkg is required to build the st and dmenu packages.\n' >&2
+        exit 1
+    fi
+
+    build_root="$(mktemp -d "${TMPDIR:-/tmp}/arch-dots-build.XXXXXX")"
+    trap 'rm -rf -- "$build_root"' EXIT
+    shopt -s nullglob
+    for package_dir in st dmenu; do
+        build_dir="$build_root/$package_dir"
+        mkdir -p "$build_dir"
+        cp -a "$script_dir/$package_dir/." "$build_dir/"
+        printf 'Building %s from the checked-in sources with makepkg -cf...\n' "$package_dir"
+        (cd "$build_dir" && makepkg -cf)
+
+        package_archives=()
+        for archive in "$build_dir"/*.pkg.tar.*; do
+            [[ "$archive" == *-debug-* ]] && continue
+            package_archives+=("$archive")
+        done
+        if ((${#package_archives[@]} == 0)); then
+            printf 'makepkg did not produce an installable package for %s.\n' "$package_dir" >&2
+            exit 1
+        fi
+        sudo pacman -U --needed "${package_archives[@]}"
+    done
 fi
 
 stamp="$(date +%Y%m%d-%H%M%S)"
