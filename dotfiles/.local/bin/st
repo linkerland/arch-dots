@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Prefer the installed suckless terminal build; use xterm if st is not installed.
-font="DejaVuSansM Nerd Font Mono:size=14"
-for terminal in /usr/sbin/st /usr/bin/st; do
-    if [[ -x "$terminal" ]]; then
-        exec "$terminal" -f "$font" "$@"
-    fi
-done
-exec xterm "$@"
